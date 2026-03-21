@@ -125,7 +125,7 @@ def login():
                         user_row['email']
                     )
                     login_user(user)
-                    return redirect(url_for('register'))    # Temporary: change to landing/homepage
+                    return redirect(url_for('home'))    
             else:
                 # Either user doesn't exist OR password is wrong.
                 flash("Invalid username or password", 'error')
@@ -138,7 +138,12 @@ def login():
 def logout():
     logout_user()
     flash("You have been logged out", "success")
-    return redirect(url_for("home"))    # Temporary: change to landing/homepage.
+    return redirect(url_for("home"))    
+
+@app.route("/")
+@login_required
+def home():
+    return render_template("index.html")
 
 
 if __name__ == '__main__':

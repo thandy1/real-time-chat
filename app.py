@@ -145,6 +145,48 @@ def logout():
 def home():
     return render_template("index.html")
 
+@app.route("/create_room", methods=["POST", "GET"])
+@login_required
+def create_room():
+    """
+    Handles Creating a Room.
+    GET: Render the create_room template.
+    POST: Retrieve the room-name from the form, insert room_name as a column into rooms table in DB, redirect to room_list.
+    """
+    if request.method == "POST":
+        room_name = request.form.get('room-name')
+        try:
+            with get_database_connection() as database_connection:
+                db_cursor = database_connection.cursor()
+                db_cursor.execute(
+                    '''INSERT INTO rooms (room_name) VALUES (?)
+                    ''', (room_name,)
+                )
+        # Catch integrity error for duplicate room names.
+        except sqlite3.IntegrityError:
+            flash("Room Name already exists,", "error")
+        else:
+            flash("Room Creation Successful!", "success")
+            return redirect(url_for("rooms_list"))
+    
+    return render_template("rooms/create_room.html")
+    
+@app.route("/rooms_list")
+@login_required
+def rooms_list():
+    '''
+    List the rooms that currently exist.
+    '''
+    with get_database_connection() as database_connection:
+        db_cursor = database_connection.cursor()
+        # Query database for each column list in rooms table and order in descending order.
+        db_cursor.execute(
+            '''SELECT room_id, room_name, created_at FROM rooms ORDER BY created_at DESC'''
+        )
+        rooms = db_cursor.fetchall()    # Get all rows
+        return render_template("rooms/rooms_list.html", rooms=rooms)
+
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

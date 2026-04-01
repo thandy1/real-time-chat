@@ -9,9 +9,9 @@ TBD
 ## Tech Stack
 **Backend:** Python, Flask, Flask-SocketIO, Flask-Login
 
-**Database:** SQLite with raw SQL queries
+**Database:** SQLite 
 
-**Frontend:** HTML, CSS, Vanilla JavaScript
+**Frontend:** HTML, CSS, JavaScript
 
 **Real-Time:** WebSocket (Socket.IO)
 

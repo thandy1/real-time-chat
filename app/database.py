@@ -49,5 +49,3 @@ def initialize_database():
         ''')
     print("Database initialized successfully!")
 
-if __name__ == '__main__':
-    initialize_database()

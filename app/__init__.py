@@ -4,7 +4,7 @@ from flask_socketio import SocketIO
 from flask_login import LoginManager
 from dotenv import load_dotenv
 
-# Load environment variables from a .env file if it exists. This allows us to keep sensitive information like the SECRET_KEY out of our source code.
+# Load environment variables from a .env file. This allows us to keep sensitive information like the SECRET_KEY out of our source code.
 load_dotenv()
 
 # Create flask app instance. This is the core of our application where we will register routes, initialize extensions, and configure settings.
@@ -21,14 +21,16 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'routes.login' 
 
-
+# Extensions are set up, safe to import from our own modules now.
 from .database import initialize_database, get_database_connection
 from .models import User
 
 @login_manager.user_loader  
 def load_user(user_id):
     """
-    This function is used to keep user sessions alive. Flask-Login will call this function to load the user object from the user_id stored in the session cookie. It queries the database for the user with the given user_id and returns a User object if found, or None if no user is found.
+    On every request made by an authenticated user, flask-login will call this function to fetch the user_id from the session cookie and uses it to retrieve the full User object from the database. The returned
+    User object is what flask-login exposes as current_user throughout
+    the request.
     """
     with get_database_connection() as database_connection:
         db_cursor = database_connection.cursor()
@@ -52,6 +54,7 @@ initialize_database()
 from .routes import routes
 from .sockets import sockets
 
-# Register blueprints for routes and sockets. This allows us to organize our application into modular components. The routes blueprint will handle HTTP routes, while the sockets blueprint will handle WebSocket events.
+# Register blueprints for routes and sockets. This allows us to organize our application into modular components. The routes blueprint will handle HTTP routes, while the sockets blueprint will handle WebSocket events. 
 app.register_blueprint(routes)
 app.register_blueprint(sockets)
+

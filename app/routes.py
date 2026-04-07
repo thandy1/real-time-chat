@@ -10,11 +10,9 @@ routes = Blueprint('routes', __name__)
 
 @routes.route('/register', methods=['GET', 'POST'])
 def register():
-    """
-    Handle user registration.
+    """Handle user registration.
     GET: Display registration form.
-    POST: Process form submission, hash password, insert new user into database.
-    """
+    POST: Process form submission, hash password, insert new user into database."""
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
@@ -24,7 +22,9 @@ def register():
             with get_database_connection() as database_connection:
                 db_cursor = database_connection.cursor()
                 db_cursor.execute(
-                    '''INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)''', (username, email, hashed_password)
+                    """
+                    INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)
+                    """, (username, email, hashed_password)
                 )
         # Handle potential integrity errors (like duplicate username or email) 
         except sqlite3.IntegrityError as e:
@@ -43,19 +43,18 @@ def register():
 
 @routes.route('/login', methods=["POST", "GET"])
 def login():
-    """
-    Handle user login.
+    """Handle user login.
     GET: Display login form.
-    POST: Process form submission, verify password, log user in if successful.
-    """
+    POST: Process form submission, verify password, log user in if successful."""
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password') or ''
         with get_database_connection() as database_connection:
             db_cursor = database_connection.cursor()
             db_cursor.execute(
-                '''SELECT user_id, username, email, password_hash FROM users WHERE username = ?
-                ''', (username,)
+                """
+                SELECT user_id, username, email, password_hash FROM users WHERE username = ?
+                """, (username,)
             )
             user_row = db_cursor.fetchone()
             # Check if user_row exists
@@ -93,19 +92,18 @@ def home():
 @routes.route("/create_room", methods=["POST", "GET"])
 @login_required
 def create_room():
-    """
-    Handle the creation of new chat rooms.
+    """Handle the creation of new chat rooms.
     GET: Render the form to create a new room.
-    POST: Process the form submission, insert new room into database, handle duplicate room names.
-    """
+    POST: Process the form submission, insert new room into database, handle duplicate room names."""
     if request.method == "POST":
         room_name = request.form.get('room-name')
         try:
             with get_database_connection() as database_connection:
                 db_cursor = database_connection.cursor()
                 db_cursor.execute(
-                    '''INSERT INTO rooms (room_name) VALUES (?)
-                    ''', (room_name,)
+                    """
+                    INSERT INTO rooms (room_name) VALUES (?)
+                    """, (room_name,)
                 )
         except sqlite3.IntegrityError:
             flash("Room Name already exists,", "error")
@@ -121,8 +119,7 @@ def create_room():
 def rooms_list():
     """Handles Displaying the List of Rooms.
     Queries the database for all rooms, orders them by creation date in descending order, 
-    and renders the rooms_list template with the retrieved rooms data.
-    """
+    and renders the rooms_list template with the retrieved rooms data."""
     with get_database_connection() as database_connection:
         db_cursor = database_connection.cursor()
         db_cursor.execute(
@@ -148,13 +145,13 @@ def chat(room_id):
             return redirect(url_for(".rooms_list"))
         # Fetch the messages for the room along with the username of the sender
         db_cursor.execute(
-            '''
+            """
             SELECT messages.message_id, messages.message_content, messages.message_timestamp, users.username
             FROM messages
             JOIN users ON messages.user_id = users.user_id
             WHERE messages.room_id = ?
             ORDER BY messages.message_timestamp ASC
-            ''', (room_id,)
+            """, (room_id,)
         )
         messages = db_cursor.fetchall()
         return render_template("rooms/chat.html", room=room, messages=messages)

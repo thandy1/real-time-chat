@@ -1,19 +1,16 @@
-from flask import Blueprint, request
+from flask import request
 from flask_socketio import emit, join_room, leave_room, send
 from flask_login import current_user, login_required
 from . import socketio
 from .database import get_database_connection
 from datetime import datetime
 
-sockets = Blueprint("sockets", __name__)
 
 @socketio.on("join")
 def on_join(data):
-    """
-    This function allows the user to join a room through the server and
+    """This function allows the user to join a room through the server and
     send the room's message history data to the client to parse and display to the user who made the request. 
-    Additionally, the function will emit status messages for all users in the given room to see when a new user joins the room. 
-    """
+    Additionally, the function will emit status messages for all users in the given room to see when a new user joins the room. """
     room_id = data["room_id"]
     join_room(room_id)
     # Retrieve message history of the given room.
@@ -41,10 +38,8 @@ def on_join(data):
 
 @socketio.on("leave")
 def on_leave(data):
-    """
-    This function allows the user to leave a room through the server and
-    emits a status message to all users in the given room that the user left the room.
-    """
+    """This function allows the user to leave a room through the server and
+    emits a status message to all users in the given room that the user left the room."""
     room_id = data["room_id"]
     leave_room(room_id)
     emit("status", {"msg": f"{current_user.username} has left the room."}, to=room_id)
@@ -52,12 +47,10 @@ def on_leave(data):
 
 @socketio.on("message")
 def send_message(data):
-    """
-    Client sends the user's message and room id of origin to the server.
+    """Client sends the user's message and room id of origin to the server.
     The server saves the message's data to the database creating a new row
     in the messages table. The server emits the given message and its data
-    back to the client to display to all user's in the given room.
-    """
+    back to the client to display to all user's in the given room."""
     message_content = data["message_content"]
     room_id = data["room_id"]
     # For the, emit so no need for an extra query since the 
@@ -82,8 +75,6 @@ def send_message(data):
 # - Dont know which room they were in unless you track it explicitly.
 @socketio.on("disconnect")
 def on_disconnect():
-    """
-    This function executes automatically when a user closes the browser or
-    loses connection.
-    """
+    """This function executes automatically when a user closes the browser or
+    loses connection."""
     print(f"{current_user.username} disconnected")

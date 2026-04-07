@@ -1,7 +1,10 @@
 import sqlite3
 from contextlib import contextmanager
+import os
 
-DATABASE_FILE = 'chat.db'
+# NOTE: On import, app now checks the environment for a DATABASE_FILE variable.
+# Defaults to chat.db if not set -- allows tests to override with a throwaway database.
+DATABASE_FILE = os.environ.get("DATABASE_FILE", "chat.db")
 
 @contextmanager
 def get_database_connection():

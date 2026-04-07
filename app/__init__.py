@@ -50,11 +50,13 @@ def load_user(user_id):
 # Initialize the database by creating necessary tables if they don't exist. 
 initialize_database()  
 
-# These import must remain at the bottom to avoid circular imports.
-from .routes import routes
-from .sockets import sockets
+# Bottom imports prevent circular imports — must stay here
+from .routes import routes   # registers all @routes.route() handlers
+from . import sockets           # registers all @socketio.on() handlers
 
-# Register blueprints for routes and sockets. This allows us to organize our application into modular components. The routes blueprint will handle HTTP routes, while the sockets blueprint will handle WebSocket events. 
 app.register_blueprint(routes)
-app.register_blueprint(sockets)
+
+
+
+
 

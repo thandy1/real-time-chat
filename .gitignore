@@ -9,6 +9,7 @@ ENV/
 
 # Database files
 chat.db
+test.db
 *.db
 *.sqlite
 *.sqlite3
@@ -36,8 +37,6 @@ docs/
 notes.md
 plan.md
 
-# Flask instance folder
-instance/
 
 # Testing
 .pytest_cache/

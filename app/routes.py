@@ -26,7 +26,6 @@ def register():
                     INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)
                     """, (username, email, hashed_password)
                 )
-        # Handle potential integrity errors (like duplicate username or email) 
         except sqlite3.IntegrityError as e:
             if "username" in str(e).lower():
                 flash("Username already exists.", "error")
@@ -44,8 +43,8 @@ def register():
 @routes.route('/login', methods=["POST", "GET"])
 def login():
     """Handle user login.
-    GET: Display login form.
-    POST: Process form submission, verify password, log user in if successful."""
+    GET: Render the login form.
+    POST: Process the form submission, check the username and password against the database, and log the user in if credentials are correct."""
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password') or ''
@@ -132,7 +131,12 @@ def rooms_list():
 @routes.route("/chat/<int:room_id>")
 @login_required
 def chat(room_id):
-    """Handles Displaying the Chat Room."""
+    """
+    Handles displaying the chat interface for a given room.
+    
+    Queries the database for the room details and all messages associated with the room.
+    Renders the chat template with the retrieved room and messages data.
+    """
     with get_database_connection() as database_connection:
         db_cursor = database_connection.cursor()
         # Fetch the room details

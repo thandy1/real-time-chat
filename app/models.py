@@ -10,3 +10,4 @@ class User(UserMixin):
     def get_id(self):
         """Returns the unique identifier for the user, which Flask-Login uses to manage sessions. In this case, we return the user_id as a string."""
         return str(self.user_id)
+    

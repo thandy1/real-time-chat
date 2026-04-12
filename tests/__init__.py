@@ -1,1 +1,3 @@
-# marks directory as a package
+import os
+os.environ["DATABASE_FILE"] = "tests/test.db"
+

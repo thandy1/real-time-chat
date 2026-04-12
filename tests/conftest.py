@@ -1,26 +1,20 @@
 import pytest
 import os
-# Must be set before app is imported. This ensures the test database is used from the start.
-os.environ["DATABASE_FILE"] = "test.db" 
+from app.database import initialize_database
+from app import app as test_flask_app
 
-from app import app as flask_app
-from app.database import get_database_connection, initialize_database
-
-
-@pytest.fixture
+@pytest.fixture()
 def app():
-    """Creates a fresh test app instance with a clean database for each test."""
-    flask_app.config["TESTING"] = True  # Propagate exceptions instead of returning errors
-    flask_app.config["SECRET_KEY"] = "test-secret-key"    
-
-    # Set up -- create tables
+    """
+    Provides a test instance of the Flask app. Sets the app in testing mode and initializes the database.
+    The database is removed after the test is finished.
+    """
+    test_flask_app.config["TESTING"] = True  
+    test_flask_app.config["SECRET_KEY"] = "test-secret-key"    
     initialize_database()
-
-    yield flask_app   # run the test
-
-    # Tear down -- delete test database after test finishes
-    if os.path.exists("test.db"):
-        os.remove("test.db")
+    yield test_flask_app  
+    if os.path.exists("tests/test.db"):
+        os.remove("tests/test.db")
 
 
 @pytest.fixture
@@ -31,14 +25,15 @@ def client(app):
 
 @pytest.fixture
 def auth_client(client):
-    """Provides an already logged in test client for testing protected routes."""
-    # Register a test user
+    """
+    Provides a test HTTP client for making requests to the app without running the server.
+    The client is logged in as a test user after registration.
+    """
     client.post("/register", data={
         "username": "testuser",
         "email": "test@test.com",
         "password": "testpassword"
     })
-    # Log them in
     client.post("/login", data={
         "username": "testuser",
         "password": "testpassword"

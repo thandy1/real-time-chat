@@ -38,7 +38,6 @@ def load_user(user_id):
             '''SELECT user_id, username, email FROM users where user_id = ?''', (user_id,)
         )
         user_row = db_cursor.fetchone()
-        # Check if a user was found and return a User object. If no user is found, return None.
         if user_row:
             return User(
                 user_row['user_id'], 

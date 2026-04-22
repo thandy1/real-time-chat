@@ -34,7 +34,17 @@ def test_auth_user_post_to_create_room(auth_client):
     assert response.status_code == 302
 
 
-# NOTE: Test /rooms_list, an authenticated user can fetch the rooms list and it returns 200.
-# NOTE: Test /chat/<room_id>, creating a room fetches the chat page and verify it returns 200 and contains the room data.
+def test_auth_user_fetch_rooms_list(auth_client):
+    """Test /rooms_list, an authenticated user can fetch the rooms list and it returns 200."""
+    response = auth_client.get("/rooms_list")
+    assert response.status_code == 200
 
 
+# TODO: test when chat.html template is created.
+def test_room_creation_fetch_chat_page_and_contains_room_data(auth_client):
+    """Test /chat/<int:room_id>, creating a room fetches the chat page and verify it returns 200 and contains the room data."""
+    response1 = auth_client.post("/create_room", data={
+        "room-name": "test_room"
+    })
+    response2 = auth_client.get("/chat/1")
+    assert response2.status_code == 200
